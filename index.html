@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fullscreen Playlist</title>
+  <title>Fullscreen Playlist (Edge to Edge)</title>
   <style>
     html, body {
       margin: 0;
@@ -14,26 +14,36 @@
       overflow: hidden;
     }
 
-    iframe {
+    .video-container {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      transform: scale(0.98) translate(-1vw, -1vh);
-      transform-origin: top left;
-      border: none;
-      background-color: black;
-      display: block;
+      overflow: hidden;
+      background: black;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      pointer-events: none; /* Optional: disables clicks */
     }
   </style>
 </head>
 <body>
-  <iframe 
-    src="https://www.youtube.com/embed/videoseries?si=BUqA6mji234DlV-y&list=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT&autoplay=1&loop=1&mute=0&playlist=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT"
-    allow="fullscreen; encrypted-media"
-    allowfullscreen
-    referrerpolicy="strict-origin-when-cross-origin">
-  </iframe>
+  <div class="video-container">
+    <iframe 
+      src="https://www.youtube.com/embed/videoseries?list=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT&autoplay=1&loop=1&mute=0&playlist=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT"
+      allow="autoplay; encrypted-media; fullscreen"
+      allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin">
+    </iframe>
+  </div>
 </body>
 </html>
