@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thanksgiving Playlist with Crawl</title>
+  <title>Holiday Playlist with Crawl</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      background-color: #1a0f00; /* warm brown-black */
+      background-color: #00111a; /* dark winter blue */
       overflow: hidden;
     }
 
@@ -21,7 +21,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #1a0f00;
+      background: #00111a;
       z-index: 1;
     }
 
@@ -57,15 +57,15 @@
       padding-right: 10rem;
       font-size: 4rem;
       font-weight: bold;
-      color: #ffcc66; /* warm gold */
+      color: #d9f2ff; /* icy blue-white */
 
-      /* Cozy autumn glow */
-      -webkit-text-stroke: 2px #4d2600;
+      /* Soft winter glow */
+      -webkit-text-stroke: 2px #003344;
       text-shadow:
-        0 0 10px #ffcc66,
-        0 0 20px #ff9933,
-        0 0 30px #cc6600,
-        2px 2px 6px rgba(0,0,0,0.8);
+        0 0 10px #aee6ff,
+        0 0 20px #66ccff,
+        0 0 30px #33bbff,
+        2px 2px 6px rgba(0,0,0,0.7);
     }
 
     @keyframes crawl {
@@ -74,14 +74,14 @@
     }
 
     @media (max-width: 600px) {
-      .crawler__text { font-size: 2rem; -webkit-text-stroke: 1px #4d2600; }
+      .crawler__text { font-size: 2rem; -webkit-text-stroke: 1px #003344; }
     }
   </style>
 </head>
 <body>
   <div class="video-container">
     <iframe 
-      src="https://www.youtube.com/embed/videoseries?list=PLoNXhSmdR5P3zcaHn5b-zLAZl0lgY3rg_&autoplay=1&loop=1&controls=0&modestbranding=1&showinfo=0"
+      src="https://www.youtube.com/embed/videoseries?list=PLoNXhSmdR5P1gpXpkMvFpx-JDFRa5U7dx&autoplay=1&loop=1&controls=0&modestbranding=1&showinfo=0"
       allow="autoplay; encrypted-media"
       allowfullscreen
       referrerpolicy="strict-origin-when-cross-origin">
@@ -91,8 +91,8 @@
   <!-- Crawl overlay -->
   <div class="crawler">
     <div class="crawler__inner">
-      <span class="crawler__text">🦃 Thanksgiving Break starts November 22nd 🍂</span>
-      <span class="crawler__text">🦃 Thanksgiving Break starts November 22nd 🍂</span>
+      <span class="crawler__text">🎄 Merry Christmas and Happy Holidays! ❄️ Winter Break starts December 22nd 🎅</span>
+      <span class="crawler__text">🎄 Merry Christmas and Happy Holidays! ❄️ Winter Break starts December 22nd 🎅</span>
     </div>
   </div>
 </body>
