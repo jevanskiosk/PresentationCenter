@@ -1,150 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Spring Break Playlist</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spring Break Playlist</title>
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #e0f7fa;
-      overflow: hidden;
-    }
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #e0f7fa;
+    overflow: hidden;
+  }
 
-    .video-container {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      z-index: 1;
-    }
+  #player {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120vw;
+    height: 120vh;
+    transform: translate(-50%, -50%);
+  }
 
-    .video-container iframe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 120vw;
-      height: 120vh;
-      transform: translate(-50%, -50%);
-      border: none;
-    }
+  .crawler {
+    position: fixed;
+    bottom: 5%;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    pointer-events: none;
+    white-space: nowrap;
+  }
 
-    .crawler {
-      position: fixed;
-      bottom: 5%;
-      left: 0;
-      right: 0;
-      z-index: 2;
-      pointer-events: none;
-      overflow: hidden;
-      white-space: nowrap;
-    }
+  .crawler__inner {
+    display: inline-block;
+    animation: crawl 25s linear infinite;
+  }
 
-    .crawler__inner {
-      display: inline-block;
-      animation: crawl 25s linear infinite;
-    }
+  .crawler__text {
+    display: inline-block;
+    padding-right: 10rem;
+    font-size: 4rem;
+    font-weight: bold;
+    color: #00796b;
 
-    .crawler__text {
-      display: inline-block;
-      padding-right: 10rem;
-      font-size: 4rem;
-      font-weight: bold;
-      color: #00796b;
+    -webkit-text-stroke: 2px #004d40;
+    text-shadow:
+      0 0 10px #80cbc4,
+      0 0 20px #4db6ac,
+      0 0 30px #26a69a,
+      2px 2px 6px rgba(0,0,0,0.6);
+  }
 
-      -webkit-text-stroke: 2px #004d40;
-      text-shadow:
-        0 0 10px #80cbc4,
-        0 0 20px #4db6ac,
-        0 0 30px #26a69a,
-        2px 2px 6px rgba(0,0,0,0.6);
-    }
-
-    @keyframes crawl {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    @media (max-width: 600px) {
-      .crawler__text {
-        font-size: 2rem;
-        -webkit-text-stroke: 1px #004d40;
-      }
-    }
-  </style>
+  @keyframes crawl {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+</style>
 </head>
 
 <body>
-  <div class="video-container">
-    <iframe
-      id="ytPlayer"
-      src="https://www.youtube-nocookie.com/embed/videoseries?list=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT&autoplay=1&loop=1&controls=0&modestbranding=1&mute=1&rel=0&iv_load_policy=3&playsinline=1"
-      allow="autoplay; encrypted-media"
-      allowfullscreen>
-    </iframe>
+
+<div id="player"></div>
+
+<div class="crawler">
+  <div class="crawler__inner">
+    <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
+    <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
   </div>
+</div>
 
-  <!-- Crawl -->
-  <div class="crawler">
-    <div class="crawler__inner">
-      <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
-      <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
-    </div>
-  </div>
+<script src="https://www.youtube.com/iframe_api"></script>
 
-  <script>
-    const iframe = document.getElementById("ytPlayer");
+<script>
+let player;
 
-    function reloadPlayer() {
-      const src = iframe.src;
-      iframe.src = "";
-      setTimeout(() => {
-        iframe.src = src + "&t=" + Date.now();
-      }, 500);
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    playerVars: {
+      listType: 'playlist',
+      list: 'PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT',
+      autoplay: 1,
+      controls: 0,
+      modestbranding: 1,
+      rel: 0,
+      mute: 1
+    },
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange,
+      'onError': onPlayerError
     }
+  });
+}
 
-    // ✅ Backup reload every 60 minutes (rare, not disruptive)
-    setInterval(reloadPlayer, 1000 * 60 * 60);
+function onPlayerReady(event) {
+  event.target.playVideo();
+}
 
-    // ✅ Recovery after Chromebook sleep / wake
-    window.addEventListener("focus", reloadPlayer);
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) reloadPlayer();
-    });
+function onPlayerStateChange(event) {
+  // If video ends, force next video (prevents stuck state)
+  if (event.data === YT.PlayerState.ENDED) {
+    player.nextVideo();
+  }
+}
 
-    // ✅ Detect if iframe crashes (gray screen scenario)
-    function monitorPlayer() {
-      try {
-        if (!iframe || iframe.offsetHeight === 0) {
-          reloadPlayer();
-        }
-      } catch (e) {
-        reloadPlayer();
-      }
+function onPlayerError(event) {
+  // Skip problematic videos instead of crashing
+  player.nextVideo();
+}
+
+// Safety: if player freezes, reload it
+setInterval(() => {
+  try {
+    const state = player.getPlayerState();
+    if (state === -1) { // unstarted / broken
+      player.nextVideo();
     }
+  } catch (e) {}
+}, 30000);
+</script>
 
-    // Check every minute (lightweight)
-    setInterval(monitorPlayer, 60000);
-
-    // ✅ Wake Lock (prevents sleep when allowed)
-    let wakeLock = null;
-
-    async function enableWakeLock() {
-      try {
-        wakeLock = await navigator.wakeLock.request('screen');
-      } catch (err) {}
-    }
-
-    enableWakeLock();
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        enableWakeLock();
-      }
-    });
-  </script>
 </body>
 </html>
