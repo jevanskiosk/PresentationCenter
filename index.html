@@ -1,127 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Spring Break Playlist</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spring Break Playlist</title>
 
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    background: #e0f7fa;
-    overflow: hidden;
-  }
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #e0f7fa;
+      overflow: hidden;
+    }
 
-  #player {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 120vw;
-    height: 120vh;
-    transform: translate(-50%, -50%);
-  }
+    .video-container {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 1;
+    }
 
-  .crawler {
-    position: fixed;
-    bottom: 5%;
-    left: 0;
-    right: 0;
-    z-index: 2;
-    pointer-events: none;
-    white-space: nowrap;
-  }
+    .video-container iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120vw;
+      height: 120vh;
+      transform: translate(-50%, -50%);
+      border: none;
+    }
 
-  .crawler__inner {
-    display: inline-block;
-    animation: crawl 25s linear infinite;
-  }
+    .crawler {
+      position: fixed;
+      bottom: 5%;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      pointer-events: none;
+      white-space: nowrap;
+    }
 
-  .crawler__text {
-    display: inline-block;
-    padding-right: 10rem;
-    font-size: 4rem;
-    font-weight: bold;
-    color: #00796b;
+    .crawler__inner {
+      display: inline-block;
+      animation: crawl 25s linear infinite;
+    }
 
-    -webkit-text-stroke: 2px #004d40;
-    text-shadow:
-      0 0 10px #80cbc4,
-      0 0 20px #4db6ac,
-      0 0 30px #26a69a,
-      2px 2px 6px rgba(0,0,0,0.6);
-  }
+    .crawler__text {
+      display: inline-block;
+      padding-right: 10rem;
+      font-size: 4rem;
+      font-weight: bold;
+      color: #00796b;
 
-  @keyframes crawl {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-</style>
+      -webkit-text-stroke: 2px #004d40;
+      text-shadow:
+        0 0 10px #80cbc4,
+        0 0 20px #4db6ac,
+        0 0 30px #26a69a,
+        2px 2px 6px rgba(0,0,0,0.6);
+    }
+
+    @keyframes crawl {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="player"></div>
-
-<div class="crawler">
-  <div class="crawler__inner">
-    <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
-    <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
+  <div class="video-container">
+    <iframe
+      id="ytPlayer"
+      src="https://www.youtube-nocookie.com/embed/videoseries?list=PLoNXhSmdR5P3QE-8I7NiBYb9uk-DOi6SQ&autoplay=1&loop=1&controls=0&modestbranding=1&mute=1&rel=0&iv_load_policy=3&playsinline=1"
+      allow="autoplay; encrypted-media"
+      allowfullscreen>
+    </iframe>
   </div>
-</div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
-
-<script>
-let player;
-
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    playerVars: {
-      listType: 'playlist',
-      list: 'PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT',
-      autoplay: 1,
-      controls: 0,
-      modestbranding: 1,
-      rel: 0,
-      mute: 1
-    },
-    events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange,
-      'onError': onPlayerError
-    }
-  });
-}
-
-function onPlayerReady(event) {
-  event.target.playVideo();
-}
-
-function onPlayerStateChange(event) {
-  // If video ends, force next video (prevents stuck state)
-  if (event.data === YT.PlayerState.ENDED) {
-    player.nextVideo();
-  }
-}
-
-function onPlayerError(event) {
-  // Skip problematic videos instead of crashing
-  player.nextVideo();
-}
-
-// Safety: if player freezes, reload it
-setInterval(() => {
-  try {
-    const state = player.getPlayerState();
-    if (state === -1) { // unstarted / broken
-      player.nextVideo();
-    }
-  } catch (e) {}
-}, 30000);
-</script>
+  <div class="crawler">
+    <div class="crawler__inner">
+      <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
+      <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
+    </div>
+  </div>
 
 </body>
 </html>
