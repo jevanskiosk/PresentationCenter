@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spring Break Playlist with Crawl</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spring Break Playlist</title>
 
   <style>
     html, body {
@@ -98,7 +98,7 @@
     </div>
   </div>
 
-  <!-- Stability Script -->
+  <!-- Stability + Wake Lock -->
   <script>
     const iframe = document.getElementById("ytPlayer");
 
@@ -106,13 +106,40 @@
       iframe.src = iframe.src;
     }
 
-    // Reload every 30 minutes
+    // Prevent YouTube freeze
     setInterval(reloadVideo, 1000 * 60 * 30);
 
-    // Reload after sleep/wake
+    // Recover after sleep / tab switch
     window.addEventListener("focus", reloadVideo);
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) reloadVideo();
+    });
+
+    // Wake Lock (prevent screen sleep)
+    let wakeLock = null;
+
+    async function enableWakeLock() {
+      try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        console.log('Wake Lock active');
+
+        wakeLock.addEventListener('release', () => {
+          console.log('Wake Lock released');
+        });
+
+      } catch (err) {
+        console.log('Wake Lock error:', err);
+      }
+    }
+
+    // Request wake lock on load
+    enableWakeLock();
+
+    // Re-request if screen becomes visible again
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        enableWakeLock();
+      }
     });
   </script>
 </body>
