@@ -85,7 +85,8 @@
 <body>
   <div class="video-container">
     <iframe
-      src="https://www.youtube.com/embed/videoseries?list=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT&autoplay=1&loop=1&controls=0&modestbranding=1&showinfo=0"
+      id="ytPlayer"
+      src="https://www.youtube.com/embed/videoseries?list=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT&autoplay=1&loop=1&controls=0&modestbranding=1&showinfo=0&mute=1"
       allow="autoplay; encrypted-media"
       allowfullscreen
       referrerpolicy="strict-origin-when-cross-origin">
@@ -99,5 +100,23 @@
       <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
     </div>
   </div>
+
+  <!-- Stability Fix -->
+  <script>
+    const iframe = document.getElementById("ytPlayer");
+
+    function reloadVideo() {
+      iframe.src = iframe.src;
+    }
+
+    // Reload every 30 minutes (prevents YouTube gray screen)
+    setInterval(reloadVideo, 1000 * 60 * 30);
+
+    // Reload when tab becomes active again (Chromebook sleep/wake fix)
+    window.addEventListener("focus", reloadVideo);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) reloadVideo();
+    });
+  </script>
 </body>
 </html>
