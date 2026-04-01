@@ -19,11 +19,9 @@
       position: fixed;
       inset: 0;
       overflow: hidden;
-      background: #e0f7fa;
       z-index: 1;
     }
 
-    /* Fullscreen video */
     .video-container iframe {
       position: absolute;
       top: 50%;
@@ -34,7 +32,6 @@
       border: none;
     }
 
-    /* Crawl */
     .crawler {
       position: fixed;
       bottom: 5%;
@@ -84,7 +81,7 @@
   <div class="video-container">
     <iframe
       id="ytPlayer"
-      src="https://www.youtube.com/embed/videoseries?list=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT&autoplay=1&loop=1&controls=0&modestbranding=1&mute=1"
+      src="https://www.youtube-nocookie.com/embed/videoseries?list=PLoNXhSmdR5P2FOoj1r4mZ_82o_AoOcVsT&autoplay=1&loop=1&controls=0&modestbranding=1&mute=1&rel=0&iv_load_policy=3&playsinline=1"
       allow="autoplay; encrypted-media"
       allowfullscreen>
     </iframe>
@@ -98,44 +95,51 @@
     </div>
   </div>
 
-  <!-- Stability + Wake Lock -->
   <script>
     const iframe = document.getElementById("ytPlayer");
 
-    function reloadVideo() {
-      iframe.src = iframe.src;
+    function reloadPlayer() {
+      const src = iframe.src;
+      iframe.src = "";
+      setTimeout(() => {
+        iframe.src = src + "&t=" + Date.now();
+      }, 500);
     }
 
-    // Prevent YouTube freeze
-    setInterval(reloadVideo, 1000 * 60 * 30);
+    // ✅ Backup reload every 60 minutes (rare, not disruptive)
+    setInterval(reloadPlayer, 1000 * 60 * 60);
 
-    // Recover after sleep / tab switch
-    window.addEventListener("focus", reloadVideo);
+    // ✅ Recovery after Chromebook sleep / wake
+    window.addEventListener("focus", reloadPlayer);
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) reloadVideo();
+      if (!document.hidden) reloadPlayer();
     });
 
-    // Wake Lock (prevent screen sleep)
+    // ✅ Detect if iframe crashes (gray screen scenario)
+    function monitorPlayer() {
+      try {
+        if (!iframe || iframe.offsetHeight === 0) {
+          reloadPlayer();
+        }
+      } catch (e) {
+        reloadPlayer();
+      }
+    }
+
+    // Check every minute (lightweight)
+    setInterval(monitorPlayer, 60000);
+
+    // ✅ Wake Lock (prevents sleep when allowed)
     let wakeLock = null;
 
     async function enableWakeLock() {
       try {
         wakeLock = await navigator.wakeLock.request('screen');
-        console.log('Wake Lock active');
-
-        wakeLock.addEventListener('release', () => {
-          console.log('Wake Lock released');
-        });
-
-      } catch (err) {
-        console.log('Wake Lock error:', err);
-      }
+      } catch (err) {}
     }
 
-    // Request wake lock on load
     enableWakeLock();
 
-    // Re-request if screen becomes visible again
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         enableWakeLock();
