@@ -1,115 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Spring Break Player</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spring Break Playlist</title>
 
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  background: black;
-  overflow: hidden;
-}
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #e0f7fa;
+      overflow: hidden;
+    }
 
-#player {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 120vw;
-  height: 120vh;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
+    .video-container {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 1;
+    }
 
-/* Crawl */
-.crawler {
-  position: fixed;
-  bottom: 5%;
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  z-index: 10;
-}
+    .video-container iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120vw;
+      height: 120vh;
+      transform: translate(-50%, -50%);
+      border: none;
+    }
 
-.crawler__inner {
-  display: inline-block;
-  animation: crawl 25s linear infinite;
-}
+    .crawler {
+      position: fixed;
+      bottom: 5%;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      pointer-events: none;
+      white-space: nowrap;
+    }
 
-.crawler__text {
-  font-size: 4rem;
-  color: #00796b;
-  font-weight: bold;
-  padding-right: 10rem;
-}
+    .crawler__inner {
+      display: inline-block;
+      animation: crawl 25s linear infinite;
+    }
 
-@keyframes crawl {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-</style>
+    .crawler__text {
+      display: inline-block;
+      padding-right: 10rem;
+      font-size: 4rem;
+      font-weight: bold;
+      color: #00796b;
+
+      -webkit-text-stroke: 2px #004d40;
+      text-shadow:
+        0 0 10px #80cbc4,
+        0 0 20px #4db6ac,
+        0 0 30px #26a69a,
+        2px 2px 6px rgba(0,0,0,0.6);
+    }
+
+    @keyframes crawl {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="player"></div>
-
-<div class="crawler">
-  <div class="crawler__inner">
-    <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
-    <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
+  <div class="video-container">
+    <iframe
+      id="ytPlayer"
+      src="https://www.youtube-nocookie.com/embed/videoseries?list=PLoNXhSmdR5P3QE-8I7NiBYb9uk-DOi6SQ&autoplay=1&loop=1&controls=0&modestbranding=1&mute=1&rel=0&iv_load_policy=3&playsinline=1"
+      allow="autoplay; encrypted-media"
+      allowfullscreen>
+    </iframe>
   </div>
-</div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
+  <div class="crawler">
+    <div class="crawler__inner">
+      <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
+      <span class="crawler__text">🌸 Spring Break starts April 6th! 🌼☀️</span>
+    </div>
+  </div>
 
-<script>
-const videos = [
-  "VIDEO_ID_1",
-  "VIDEO_ID_2",
-  "VIDEO_ID_3"
-  // ← you paste your playlist IDs here
-];
+  <script>
+    const iframe = document.getElementById("ytPlayer");
 
-let player;
-let index = 0;
-
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    videoId: videos[index],
-    playerVars: {
-      autoplay: 1,
-      controls: 0,
-      modestbranding: 1,
-      rel: 0
-    },
-    events: {
-      onReady: e => e.target.playVideo(),
-      onStateChange: onPlayerStateChange,
-      onError: nextVideo
+    // 🔁 HARD RESET FUNCTION
+    function reloadPlayer() {
+      const src = iframe.src;
+      iframe.src = "";
+      setTimeout(() => {
+        iframe.src = src;
+      }, 500);
     }
-  });
-}
 
-function onPlayerStateChange(event) {
-  if (event.data === YT.PlayerState.ENDED) {
-    nextVideo();
-  }
-}
+    // ⏱️ Periodic refresh (prevents long-session crashes)
+    setInterval(() => {
+      reloadPlayer();
+    }, 1000 * 60 * 45); // every 45 minutes
 
-function nextVideo() {
-  index = (index + 1) % videos.length;
-  player.loadVideoById(videos[index]);
-}
+    // 👀 Detect if tab wakes up (Chromebook sleep / wake)
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        setTimeout(() => {
+          reloadPlayer();
+        }, 2000);
+      }
+    });
 
-/* Recovery if player stalls */
-setInterval(() => {
-  if (player && player.getPlayerState() !== 1) {
-    player.playVideo();
-  }
-}, 10000);
-</script>
+    // 🧠 Failsafe: if nothing changes for too long, reload
+    let lastCheck = Date.now();
+
+    setInterval(() => {
+      const now = Date.now();
+
+      // if page has been idle too long (possible gray screen)
+      if (now - lastCheck > 1000 * 60 * 20) {
+        reloadPlayer();
+      }
+
+      lastCheck = now;
+    }, 1000 * 60 * 5);
+
+    // 🖱️ Keep session "alive" (prevents some idle throttling)
+    setInterval(() => {
+      window.dispatchEvent(new Event('mousemove'));
+    }, 1000 * 60);
+  </script>
 
 </body>
 </html>
